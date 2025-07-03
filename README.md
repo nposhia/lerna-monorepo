@@ -18,7 +18,6 @@ A **full-stack monorepo** managed with **Lerna** — combining a **React** front
   * [Run frontend](#run-frontend)
   * [Run backend](#run-backend)
   * [Run with Lerna](#run-with-lerna)
-* [Helpful Commands](#helpful-commands)
 
 ---
 
