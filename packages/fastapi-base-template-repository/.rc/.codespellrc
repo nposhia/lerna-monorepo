@@ -1,0 +1,3 @@
+[codespell]
+skip = *.pyc,*.pyo,*.png,*.jpg,*.gif,*.svg
+ignore-words-list = selectin

@@ -1,0 +1,91 @@
+services:
+  jeavio-backend:
+    image: jeavio-backend
+    container_name: jeavio-backend-server
+    pull_policy: never
+    build:
+      context: ${BACKEND_BASE_PATH:-../../}
+      dockerfile: devops/local/Dockerfile
+    restart: always
+    env_file:
+      - ${BACKEND_BASE_PATH:-../../}/.env
+    volumes:
+      - ${BACKEND_BASE_PATH:-../../}:/app
+    networks:
+      - ${NETWORK_NAME:-jeavio-backend-network}
+    ports:
+      - ${BACKEND_PORT:-5000}:${BACKEND_PORT:-5000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-5000}/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 2G
+  redis:
+    image: redis:7.4-alpine
+    container_name: jeavio-redis
+    restart: always
+    ports:
+      - ${REDIS_PORT:-6379}:${REDIS_PORT:-6379}
+    volumes:
+      - jeavio-redis-data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks:
+      - ${NETWORK_NAME:-jeavio-backend-network}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+  postgres:
+    image: ${POSTGRES_IMAGE:-pgvector/pgvector:pg17}
+    container_name: jeavio-postgres
+    restart: always
+    ports:
+      - ${POSTGRES_DATABASE_PORT:-5432}:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_DATABASE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE_NAME}
+    volumes:
+      - ${POSTGRES_CONTAINER_VOLUME_NAME:-jeavio-postgres-data}:/var/lib/postgresql/data
+      - ${BACKEND_BASE_PATH:-../../}/devops/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ${NETWORK_NAME:-jeavio-backend-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_DATABASE_USERNAME} -d ${POSTGRES_DATABASE_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 2G
+
+volumes:
+  jeavio-postgres-data:
+    name: ${POSTGRES_CONTAINER_VOLUME_NAME:-jeavio-postgres-data}
+  jeavio-redis-data:
+    name: ${REDIS_CONTAINER_VOLUME_NAME:-jeavio-redis-data}
+networks:
+  jeavio-backend-network:
+    name: ${NETWORK_NAME:-jeavio-backend-network}
+    driver: bridge

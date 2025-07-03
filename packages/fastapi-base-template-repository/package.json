@@ -1,0 +1,8 @@
+{
+  "name": "fastapi-base-template-repository",
+  "version": "1.0.0",
+  "scripts": {
+    "destroy": "docker compose -f devops/local/docker-compose.yml down -v",
+    "dev": "docker compose -f devops/local/docker-compose.yml --env-file devops/local/.env.docker up --build"
+  }
+}

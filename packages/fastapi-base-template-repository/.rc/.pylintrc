@@ -1,0 +1,39 @@
+[MAIN]
+
+# Python code to check, use the filename or directory.
+# (default: None)
+source = app
+
+# Add files or directories to the blacklist. They should be base names, not paths.
+init-hook="import sys; import os; sys.path.append(os.path.abspath('.'));"
+
+# List of plugins to load, separated by commas.
+load-plugins=pylint.extensions.docparams,pylint.extensions.typing
+
+# Paths to ignore
+ignore-paths=app/core/db/migrations
+
+[MESSAGES CONTROL]
+# Disable the following message types.
+disable=broad-exception-caught, too-few-public-methods
+
+# Only display messages, don't show the summary report.
+reports=no
+
+# Enable all messages by default. You can also disable specific ones.
+# enable=all
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=140
+
+# Output format for messages.
+output-format=colorized
+
+[DESIGN]
+# Maximum number of arguments for function/method
+max-args=6
+# Maximum number of positional arguments for function/method
+max-positional-arguments=6
+# Maximum number of local variables for function/method
+max-locals=20
