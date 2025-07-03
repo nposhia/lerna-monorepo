@@ -163,7 +163,7 @@ make up
 
 ```bash
 # Run frontend build:
-npx lerna run build --scope react-template
+npx lerna run build --scope tailwindcss4
 
 # Run backend Docker:
 npx lerna run dev --scope fastapi-base-template-repository
